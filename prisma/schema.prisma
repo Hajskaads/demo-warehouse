@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["jsonProtocol"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
+}
+
+model products {
+  id                Int               @id @default(autoincrement())
+  name              String            @unique   @db.VarChar(255)
+  contain_articles  articlesToProduct[]
+  createdAt         DateTime @default(now())
+}
+
+model articles {
+  id        Int      @id @default(autoincrement())
+  art_id    Int      @unique
+  name      String   @unique   @db.VarChar(255)
+  stock     Int
+  products  articlesToProduct[]
+  createdAt DateTime @default(now())
+}
+
+model articlesToProduct {
+  id            Int      @id @default(autoincrement())
+  products      products  @relation(fields: [product_id], references: [id])
+  articles      articles  @relation(fields: [art_id], references: [art_id])
+  amount_of     Int
+  product_id    Int
+  art_id        Int
+  createdAt     DateTime @default(now())
+}
+
+// model contain_articles {
+//   id            Int      @id @default(autoincrement())
+//   product       Product  @relation(fields: [product_id], references: [id])
+//   product_id    Int
+//   article       Article  @relation(fields: [art_id], references: [art_id])
+//   art_id        Int
+//   amount_of     Int
+//   createdAt     DateTime @default(now())
+// }
